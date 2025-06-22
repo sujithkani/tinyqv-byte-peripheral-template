@@ -7,9 +7,17 @@ You can also include images in this folder and reference them in the markdown. E
 512 kb in size, and the combined size of all images must be less than 1 MB.
 -->
 
-## How it works
+## What it does?
 
-Explain how your project works
+Explain what your peripheral does and how it works
+
+## Register map
+
+Document the registers that are used to interact with your peripheral
+
+| Address | Name  | Access | Description                                                         |
+|---------|-------|--------|---------------------------------------------------------------------|
+| 0x00    | DATA  | R/W    | A byte of data                                                      |
 
 ## How to test
 

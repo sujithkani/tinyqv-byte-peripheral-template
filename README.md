@@ -1,8 +1,14 @@
 ![](../../workflows/gds/badge.svg) ![](../../workflows/docs/badge.svg) ![](../../workflows/test/badge.svg) ![](../../workflows/fpga/badge.svg)
 
-# Tiny Tapeout Verilog Project Template
+# TinyQV Byte Peripheral Template for Tiny Tapeout
 
 - [Read the documentation for project](docs/info.md)
+
+## What is TinyQV
+
+[TinyQV](https://github.com/MichaelBell/tinyQV) is a Risc-V CPU designed for Tiny Tapeout.
+
+This template helps you create peripherals that can be integrated with TinyQV.
 
 ## What is Tiny Tapeout?
 
@@ -33,9 +39,10 @@ The GitHub action will automatically build the ASIC files using [OpenLane](https
 
 ## What next?
 
-- [Submit your design to the next shuttle](https://app.tinytapeout.com/).
-- Edit [this README](README.md) and explain your design, how it works, and how to test it.
+- Submit your preipheral for inclusion in TinyQV.  See the [Discord](https://tinytapeout.com/discord) for more details.
+- Edit [the docs](docs/info.md) and explain your design, how it works, and how to test it.
 - Share your project on your social network of choice:
   - LinkedIn [#tinytapeout](https://www.linkedin.com/search/results/content/?keywords=%23tinytapeout) [@TinyTapeout](https://www.linkedin.com/company/100708654/)
+  - Bluesky [#tinytapeout](https://bsky.app/hashtag/TinyTapeout) [@TinyTapeout](https://bsky.app/profile/tinytapeout.com)
   - Mastodon [#tinytapeout](https://chaos.social/tags/tinytapeout) [@matthewvenn](https://chaos.social/@matthewvenn)
   - X (formerly Twitter) [#tinytapeout](https://twitter.com/hashtag/tinytapeout) [@tinytapeout](https://twitter.com/tinytapeout)
