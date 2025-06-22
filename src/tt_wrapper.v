@@ -23,12 +23,22 @@ module tt_um_tqv_peripheral_harness (
   wire [7:0] data_out; // Data out from peripheral
   wire data_valid;
 
+  // Peripherals get synchronized ui_in.
+  reg [7:0] ui_in_sync;
+  synchronizer #(.STAGES(2), .WIDTH(8)) synchronizer_ui_in_inst (.clk(clk), .data_in(ui_in), .data_out(ui_in_sync));
+
+  // Register reset as in TinyQV
+  /* verilator lint_off SYNCASYNCNET */
+  reg rst_reg_n;
+  /* verilator lint_on SYNCASYNCNET */
+  always @(negedge clk) rst_reg_n <= rst_n;
+
   // The peripheral under test - change the module name here
   // to match your preipheral.
   tqvp_example user_peripheral(
     .clk(clk),
-    .rst_n(rst_n),
-    .ui_in(ui_in),
+    .rst_n(rst_reg_n),
+    .ui_in(ui_in_sync),
     .uo_out(uo_out),
     .address(address),
     .data_write(data_valid),
@@ -51,14 +61,14 @@ module tt_um_tqv_peripheral_harness (
   assign spi_clk   = uio_in[5];
   assign spi_mosi  = uio_in[6];
 
-  synchronizer #(.STAGES(2), .WIDTH(1)) synchronizer_spi_cs_n_inst (.rstb(rst_n), .clk(clk), .ena(ena), .data_in(spi_cs_n), .data_out(spi_cs_n_sync));
-  synchronizer #(.STAGES(2), .WIDTH(1)) synchronizer_spi_clk_inst  (.rstb(rst_n), .clk(clk), .ena(ena), .data_in(spi_clk),  .data_out(spi_clk_sync));
-  synchronizer #(.STAGES(2), .WIDTH(1)) synchronizer_spi_mosi_inst (.rstb(rst_n), .clk(clk), .ena(ena), .data_in(spi_mosi), .data_out(spi_mosi_sync));  
+  synchronizer #(.STAGES(2), .WIDTH(1)) synchronizer_spi_cs_n_inst (.clk(clk), .data_in(spi_cs_n), .data_out(spi_cs_n_sync));
+  synchronizer #(.STAGES(2), .WIDTH(1)) synchronizer_spi_clk_inst  (.clk(clk), .data_in(spi_clk),  .data_out(spi_clk_sync));
+  synchronizer #(.STAGES(2), .WIDTH(1)) synchronizer_spi_mosi_inst (.clk(clk), .data_in(spi_mosi), .data_out(spi_mosi_sync));  
 
   // The SPI instance
   spi_reg #(.ADDR_W(4)) i_spi_reg(
     .clk(clk),
-    .rstb(rst_n),
+    .rstb(rst_reg_n),
     .ena(ena),
     .spi_mosi(spi_mosi_sync),
     .spi_miso(spi_miso),

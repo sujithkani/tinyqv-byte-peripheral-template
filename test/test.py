@@ -27,8 +27,9 @@ async def test_project(dut):
     # Set an input value, in the example this will be added to the register value
     dut.ui_in.value = 30
 
-    # Wait for one clock cycle to see the output values
-    await ClockCycles(dut.clk, 1)
+    # Wait for two clock cycles to see the output values, because ui_in is synchronized over two clocks,
+    # and a further clock is required for the output to propagate.
+    await ClockCycles(dut.clk, 3)
 
     # The following assersion is just an example of how to check the output values.
     # Change it to match the actual expected output of your module:
