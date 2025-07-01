@@ -1,3 +1,6 @@
+# Copyright (c) 2024 Caio Alonso da Costa
+# SPDX-License-Identifier: Apache-2.0
+
 import cocotb
 from cocotb.clock import Clock
 from cocotb.triggers import ClockCycles
@@ -212,21 +215,3 @@ async def spi_read_cpha0 (clk, port_in, port_out, address, data):
   await ClockCycles(clk, 10)
 
   return miso_byte
-
-async def reset(dut):
-    # Reset
-    dut._log.info("Reset")
-    dut.ena.value = 1
-    dut.ui_in.value = 0
-    dut.uio_in.value = 0
-    dut.rst_n.value = 0
-    await ClockCycles(dut.clk, 10)
-    dut.rst_n.value = 1  
-    assert dut.uio_oe.value == 0b00001000
-
-async def write_reg(dut, reg, value):
-    await spi_write_cpha0(dut.clk, dut.uio_in, reg, value)
-
-
-async def read_reg(dut, reg):
-    return await spi_read_cpha0(dut.clk, dut.uio_in, dut.uio_out, reg, 0)

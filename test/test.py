@@ -1,11 +1,11 @@
-# SPDX-FileCopyrightText: © 2024 Tiny Tapeout
+# SPDX-FileCopyrightText: © 2025 Tiny Tapeout
 # SPDX-License-Identifier: Apache-2.0
 
 import cocotb
 from cocotb.clock import Clock
 from cocotb.triggers import ClockCycles
 
-from tqv_reg import reset, read_reg, write_reg
+from tqv import TinyQV
 
 @cocotb.test()
 async def test_project(dut):
@@ -15,14 +15,16 @@ async def test_project(dut):
     clock = Clock(dut.clk, 100, units="ns")
     cocotb.start_soon(clock.start())
 
+    tqv = TinyQV(dut)
+
     # Reset
-    await reset(dut)
+    await tqv.reset()
 
     dut._log.info("Test project behavior")
 
     # Test register write and read back
-    await write_reg(dut, 0, 20)
-    assert await read_reg(dut, 0) == 20
+    await tqv.write_reg(0, 20)
+    assert await tqv.read_reg(0) == 20
 
     # Set an input value, in the example this will be added to the register value
     dut.ui_in.value = 30
