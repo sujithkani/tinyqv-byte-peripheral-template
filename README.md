@@ -10,6 +10,21 @@
 
 This template helps you create peripherals that can be integrated with TinyQV.
 
+## Submission checklist
+
+Before submitting your design, please check:
+- You have renamed the peripheral module from `tqvp_example` to something unique that makes sense for your design.
+- You have created a [test script](test/test.py) that uses the `tqv` class to read and write your design's registers.
+- You have [documented your design](docs/info.md) and its registers.
+
+## Submission process
+
+Please raise a pull request against https://github.com/MichaelBell/ttsky25a-tinyQV adding your peripheral:
+- Add your verilog module to src/user_peripherals.  If you have multiple modules create a subdirectory.
+- Add your peripheral to the "Simple interface peripherals" section in src/peripherals.v, ask for help on Discord or in the PR if you're unsure how to do this.
+- Add your test file to test/user_peripherals.  You will need to add the peripheral number to the TinyQV constructor, this is the simple peripheral index plus 16.
+- Add your docs to docs/user_peripherals.
+
 ## What is Tiny Tapeout?
 
 Tiny Tapeout is an educational project that aims to make it easier and cheaper than ever to get your digital and analog designs manufactured on a real chip.
@@ -39,8 +54,8 @@ The GitHub action will automatically build the ASIC files using [OpenLane](https
 
 ## What next?
 
-- Submit your preipheral for inclusion in TinyQV.  See the [Discord](https://tinytapeout.com/discord) for more details.
 - Edit [the docs](docs/info.md) and explain your design, how it works, and how to test it.
+- Submit your preipheral for inclusion in TinyQV.  See the [Discord](https://tinytapeout.com/discord) for more details.
 - Share your project on your social network of choice:
   - LinkedIn [#tinytapeout](https://www.linkedin.com/search/results/content/?keywords=%23tinytapeout) [@TinyTapeout](https://www.linkedin.com/company/100708654/)
   - Bluesky [#tinytapeout](https://bsky.app/hashtag/TinyTapeout) [@TinyTapeout](https://bsky.app/profile/tinytapeout.com)
