@@ -9,8 +9,9 @@ module tqvp_example (
     input         clk,
     input         rst_n,
 
-    input  [7:0]  ui_in,        // The input PMOD, always available
-    output [7:0]  uo_out,       // The output PMOD.  Each wire is only connected if this peripheral is selected
+    input  [7:0]  ui_in,        // The input PMOD, always available.  Note that ui_in[7] is normally used for UART RX.
+    output [7:0]  uo_out,       // The output PMOD.  Each wire is only connected if this peripheral is selected.
+                                // Note that uo_out[0] is normally used for UART TX.
 
     input [3:0]   address,      // Address within this peripheral's address space
 
