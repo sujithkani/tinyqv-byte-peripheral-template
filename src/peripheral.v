@@ -10,6 +10,8 @@ module tqvp_example (
     input         rst_n,
 
     input  [7:0]  ui_in,        // The input PMOD, always available.  Note that ui_in[7] is normally used for UART RX.
+                                // The inputs are synchronized to the clock, note this will introduce 2 cycles of delay on the inputs.
+
     output [7:0]  uo_out,       // The output PMOD.  Each wire is only connected if this peripheral is selected.
                                 // Note that uo_out[0] is normally used for UART TX.
 
