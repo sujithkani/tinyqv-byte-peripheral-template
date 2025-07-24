@@ -77,8 +77,7 @@ module tt_um_tqv_peripheral_harness (
     .reg_addr(address),
     .reg_data_i(data_out),
     .reg_data_o(data_in),
-    .reg_data_o_dv(data_valid),
-    .status(8'h0)
+    .reg_data_o_dv(data_valid)
   );
 
   // Assign outputs

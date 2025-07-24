@@ -17,8 +17,7 @@ module spi_reg #(
     output logic [ADDR_W-1:0] reg_addr,
     input  logic [REG_W-1:0] reg_data_i,
     output logic [REG_W-1:0] reg_data_o,
-    output logic reg_data_o_dv,
-    input  logic [7:0] status
+    output logic reg_data_o_dv
 );
 
   // Start of frame - negedge of spi_cs_n
