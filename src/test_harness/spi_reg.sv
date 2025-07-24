@@ -21,12 +21,6 @@ module spi_reg #(
     input  logic [7:0] status
 );
 
-  // Map to outputs
-  assign reg_addr = addr;
-  assign reg_data_o = data;
-  assign reg_data_o_dv = dv;
-  assign spi_miso = tx_buffer[REG_W-1];
-
   // Start of frame - negedge of spi_cs_n
   logic sof;
   // Pulse on start of frame
@@ -79,6 +73,9 @@ module spi_reg #(
       end
     end
   end
+
+  // General counter
+  logic [3:0] buffer_counter;
 
   // Sample addr and data
   logic tx_buffer_load;
@@ -155,9 +152,6 @@ module spi_reg #(
     end
   end
 
-  // General counter
-  logic [3:0] buffer_counter;
-
   // RX Buffer Counter
   always_ff @(negedge(rstb) or posedge(clk)) begin
     if (!rstb) begin
@@ -192,20 +186,27 @@ module spi_reg #(
     end
   end
 
-  // Data register and data valid strobe
-  logic [REG_W-1:0] data;
+  // Address output
+  assign reg_addr = addr;
+
+  // Data valid strobe
   logic dv;
 
-    // Data and DataValid (dv) Registers
+  // RX buffer can be directly assigned to the data output.  
+  // Previously this re-sampled but that cost 8 flops.
+  // DV is only indicated at the end of the SPI transaction and rx_buffer will be stable, 
+  // so there's no need for the extra 8-flop buffer.
+  assign reg_data_o = rx_buffer;
+  assign reg_data_o_dv = dv;
+
+  // DataValid (dv) Registers
   always_ff @(negedge(rstb) or posedge(clk)) begin
     if (!rstb) begin
-      data <= '0;
       dv <= '0;
     end else begin
       if (ena == 1'b1) begin
         dv <= '0;
         if (sample_data == 1'b1) begin
-          data <= rx_buffer;
           dv <= (1'b1 & reg_rw);
         end
       end
@@ -231,5 +232,8 @@ module spi_reg #(
       end
     end
   end
+
+  // MISO output
+  assign spi_miso = tx_buffer[REG_W-1];  
 
 endmodule

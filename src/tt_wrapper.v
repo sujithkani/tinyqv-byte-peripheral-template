@@ -90,6 +90,6 @@ module tt_um_tqv_peripheral_harness (
   assign uio_oe[2:0] = 0;
 
   // Ignore unused inputs
-  wire _unused = &{uio_in[7], uio_in[3:0], 1'b0};
+  wire _unused = &{ena, uio_in[7], uio_in[3:0], 1'b0};
 
 endmodule
