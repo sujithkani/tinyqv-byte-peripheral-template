@@ -186,6 +186,9 @@ async def spi_read_cpha0 (clk, port_in, port_out, address, data):
   miso_byte = 0
   miso_bit = 0
 
+  # Allow an extra clock here so the read works correctly
+  await ClockCycles(clk, 1)
+
   iterator = 7
   while iterator >= 0:
     # Data[iterator]
