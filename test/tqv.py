@@ -11,7 +11,7 @@ from tqv_reg import spi_write_cpha0, spi_read_cpha0
 # is used that reads and writes the registers using Risc-V commands:
 # https://github.com/MichaelBell/ttsky25a-tinyQV/blob/main/test/tqv.py
 class TinyQV:
-    def __init__(self, dut):
+    def __init__(self, dut, peripheral_num):
         self.dut = dut
 
     # Reset the design, this reset will initialize TinyQV and connect

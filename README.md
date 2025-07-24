@@ -27,7 +27,7 @@ Please raise a pull request against https://github.com/TinyTapeout/ttsky25a-tiny
 
 If you have any trouble following the steps below, ask in the Tiny Tapeout Discord or in the PR.
 
-### Add your verilog source to src/user_peripherals.
+### Add your verilog source to src/user_peripherals
 
 * If you have multiple modules create a subdirectory.
 * Add each source file to the info.yaml source_files section
@@ -39,10 +39,10 @@ If you have any trouble following the steps below, ask in the Tiny Tapeout Disco
   * `.data_write((data_write_n != 2'b11) & peri_simple[0]),`
   * `.data_out(data_from_simple_peri[0]),`
 
-### Add your test file to test/user_peripherals.
+### Add your test file to test/user_peripherals
 
 * Copy the test in to a subdirectory of test/user_peripherals
-* Update your testbench.py to set the PERIPHERAL_NUM to the simple peripheral index used in peripherals.v plus 16.
+* Update your testbench.py to set the PERIPHERAL_NUM to 16 plus the simple peripheral index used in peripherals.v.
 * In test/Makefile, add the name of your test to the all recipe. If your test is called my_peripheral.py add this: `peri-my_peripheral.xml`
 
 To run your test, make sure you have installed the `requirements.txt`, then:
@@ -52,7 +52,7 @@ To run your test, make sure you have installed the `requirements.txt`, then:
 
 And the compressed waveform will be in `sim_build/rtl/tb.fst`
 
-### Add your docs to docs/user_peripherals.
+### Add your docs to docs/user_peripherals
 
 * Copy your docs/info.md into this folder and rename it appropriately (e.g. my_peripheral.md)
 
