@@ -69,7 +69,7 @@ module tt_um_tqv_peripheral_harness (
   spi_reg #(.ADDR_W(4)) i_spi_reg(
     .clk(clk),
     .rstb(rst_reg_n),
-    .ena(ena),
+    .ena(1'b1),
     .spi_mosi(spi_mosi_sync),
     .spi_miso(spi_miso),
     .spi_clk(spi_clk_sync),

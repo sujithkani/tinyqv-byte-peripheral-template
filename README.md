@@ -23,11 +23,53 @@ Before submitting your design, please check:
 
 ## Submission process
 
-Please raise a pull request against https://github.com/TinyTapeout/ttsky25a-tinyQV adding your peripheral:
-- Add your verilog module to src/user_peripherals.  If you have multiple modules create a subdirectory.
-- Add your peripheral to the "Byte interface peripherals" section in src/peripherals.v, ask for help on Discord or in the PR if you're unsure how to do this.
-- Add your test file to test/user_peripherals.  You will need to add the peripheral number to the TinyQV constructor, this is the simple peripheral index plus 16.
-- Add your docs to docs/user_peripherals.
+Please raise a pull request against https://github.com/TinyTapeout/ttsky25a-tinyQV adding your peripheral.  Link to your peripheral repo in the PR.
+
+If you have any trouble following the steps below, ask in the Tiny Tapeout Discord or in the PR.
+
+### Add your verilog source to src/user_peripherals.
+
+* If you have multiple modules create a subdirectory.
+* Add each source file to the info.yaml source_files section
+
+### Add your peripheral to the "Byte interface peripherals" section in src/peripherals.v
+
+* Each peripheral needs its own index, and you'll have to update that in 3 different places (the example shows peripheral index of 0) :
+  * `.uo_out(uo_out_from_simple_peri[0]),`
+  * `.data_write((data_write_n != 2'b11) & peri_simple[0]),`
+  * `.data_out(data_from_simple_peri[0]),`
+
+### Add your test file to test/user_peripherals.
+
+* Copy the test in to a subdirectory of test/user_peripherals
+* Update your testbench.py to set the PERIPHERAL_NUM to the simple peripheral index used in peripherals.v plus 16.
+* In test/test_basic.mk, include your sources in PROJECT_SOURCES 
+* In test/test_basic.mk, if you are using your own Python modules, extend PYTHONPATH to include them
+* In test/test_prog.mk, include your sources in PROJECT_SOURCES 
+* In test/Makefile, add the name of your test to the all recipe. If your test is called my_peripheral.py add this: `peri-my_peripheral.xml`
+
+To run your test, make sure you have installed the `requirements.txt`, then:
+
+    make peri-my_peripheral.xml
+
+And the compressed waveform will be in `sim_build/rtl/tb.fst`
+
+### Add your docs to docs/user_peripherals.
+
+* Copy your docs/info.md into this folder and rename it appropriately (e.g. my_peripheral.md)
+
+## The peripheral test harness
+
+This template includes a test harness for your peripheral that communicates with the peripheral using SPI.  This allows you to develop and test your peripheral independently of the rest of the Risc-V SoC.
+
+The SPI interface implemented by the test harness has a one byte command with format:
+| Bits | Meaning |
+| ---- | ------- |
+| 7    | Read or write command: 1 for a write, 0 for a read |
+| 6-4  | Unused |
+| 3-0  | The register address |
+
+For a write the next byte transmitted is the byte to write to the register.  For a read, the test harness reads the register and transmits it back to the SPI controller.
 
 ## Testing your design with TinyQV
 
