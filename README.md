@@ -34,10 +34,26 @@ If you have any trouble following the steps below, ask in the Tiny Tapeout Disco
 
 ### Add your peripheral to the "Byte interface peripherals" section in src/peripherals.v
 
-* Each peripheral needs its own index, and you'll have to update that in 3 different places (the example shows peripheral index of 0) :
-  * `.uo_out(uo_out_from_simple_peri[0]),`
-  * `.data_write((data_write_n != 2'b11) & peri_simple[0]),`
-  * `.data_out(data_from_simple_peri[0]),`
+Each peripheral needs to go in its own slot in.  Find an existing slot that is still set to use the `tqvp_byte_example` peripheral, this example shows slot 2:
+
+    tqvp_byte_example i_user_simple02 (
+        .clk(clk),
+        .rst_n(rst_n),
+
+        .ui_in(ui_in),
+        .uo_out(uo_out_from_simple_peri[2]),
+
+        .address(addr_in[3:0]),
+
+        .data_write((data_write_n != 2'b11) & peri_simple[2]),
+        .data_in(data_in[7:0]),
+
+        .data_out(data_from_simple_peri[2])
+    );
+
+and change the first line to match your peripheral, for example:
+
+    tqvp_matt_encoder matt_encoder02 (
 
 ### Add your test file to test/user_peripherals
 
