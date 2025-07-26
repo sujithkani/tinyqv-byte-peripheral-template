@@ -31,9 +31,11 @@ module tqvp_pwm_sujith (
         end
     end
 
-    // PWM counter: free-running 8-bit counter
+    // PWM counter: reset when new duty written
     always @(posedge clk or negedge rst_n) begin
         if (!rst_n)
+            counter <= 8'd0;
+        else if (data_write && address == 4'h0)
             counter <= 8'd0;
         else
             counter <= counter + 8'd1;
