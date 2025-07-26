@@ -31,20 +31,22 @@ async def test_project(dut):
     readback = await tqv.read_reg(0)
     assert readback == 128, f"Expected 128, got {readback}"
 
-    # Let it run for a few cycles
+    # Let it settle (after synchronizers and counter)
     await ClockCycles(dut.clk, 3)
 
     # Sample the PWM output
     seen_high = False
     seen_low = False
 
-    for _ in range(200):
+    for _ in range(512):  # Two full PWM cycles
         await ClockCycles(dut.clk, 1)
         pwm = int(dut.uo_out.value[0])
-        if pwm == 1:
+        if pwm == 1 and not seen_high:
             seen_high = True
-        if pwm == 0:
+            dut._log.info("PWM went HIGH")
+        if pwm == 0 and not seen_low:
             seen_low = True
+            dut._log.info("PWM went LOW")
 
     # Confirm that output toggled
     assert seen_high and seen_low, "PWM did not toggle as expected"
