@@ -1,51 +1,35 @@
 /*
- * Copyright (c) 2025 Your Name
+ * Copyright (c) 2025 Sujith Kani
  * SPDX-License-Identifier: Apache-2.0
  */
-
 `default_nettype none
-
-// Change the name of this module to something that reflects its functionality and includes your name for uniqueness
-// For example tqvp_yourname_spi for an SPI peripheral.
-// Then edit tt_wrapper.v line 38 and change tqvp_example to your chosen module name.
-module tqvp_example (
-    input         clk,          // Clock - the TinyQV project clock is normally set to 64MHz.
-    input         rst_n,        // Reset_n - low to reset.
-
-    input  [7:0]  ui_in,        // The input PMOD, always available.  Note that ui_in[7] is normally used for UART RX.
-                                // The inputs are synchronized to the clock, note this will introduce 2 cycles of delay on the inputs.
-
-    output [7:0]  uo_out,       // The output PMOD.  Each wire is only connected if this peripheral is selected.
-                                // Note that uo_out[0] is normally used for UART TX.
-
-    input [3:0]   address,      // Address within this peripheral's address space
-
-    input         data_write,   // Data write request from the TinyQV core.
-    input [7:0]   data_in,      // Data in to the peripheral, valid when data_write is high.
-    
-    output [7:0]  data_out      // Data out from the peripheral, set this in accordance with the supplied address
+module tqvp_sujith_pwm(
+    input clk, rst_n,
+    input [7:0] ui_in,        // Unused here, but must be connected.
+    output [7:0] uo_out,       // PWM output on uo_out[0], others are 0.
+    input [3:0] address,      // 4-bit local address.
+    input data_write,   // Write strobe.
+    input  [7:0] data_in,      // Data to write.
+    output [7:0] data_out      // Data to read.
 );
-
-    // Example: Implement an 8-bit read/write register at address 0
-    reg [7:0] example_data;
+    // Register to store duty cycle (0–255)
+    reg [7:0] duty_cycle;
+    reg [7:0] pwm_counter;
+    // Write to duty_cycle at address 0
     always @(posedge clk) begin
-        if (!rst_n) begin
-            example_data <= 0;
-        end else begin
-            if (address == 4'h0) begin
-                if (data_write) example_data <= data_in;
-            end
+        if(!rst_n) begin
+            duty_cycle<=8'd0;
+            pwm_counter<=8'd0;
+        end 
+        else begin
+            if (data_write&&address==4'h0)
+                duty_cycle<=data_in;
+            pwm_counter<=pwm_counter+1;
         end
     end
-
-    // All output pins must be assigned. If not used, assign to 0.
-    assign uo_out  = ui_in + example_data;  // Example: uo_out is the sum of ui_in and the example register
-
-    // Address 0 reads the example data register.  
-    // Address 1 reads ui_in
-    // All other addresses read 0.
-    assign data_out = (address == 4'h0) ? example_data :
-                      (address == 4'h1) ? ui_in :
-                      8'h0;    
-
+    // Output PWM signal on uo_out[0]
+    assign uo_out[0]=(pwm_counter<duty_cycle)?1'b1:1'b0;
+    assign uo_out[7:1]=7'b0;
+    // Read current duty cycle from address 0
+    assign data_out=(address==4'h0)?duty_cycle:8'h00;
 endmodule
