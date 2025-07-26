@@ -47,6 +47,9 @@ async def test_project(dut):
         if pwm == 0 and not seen_low:
             seen_low = True
             dut._log.info("PWM went LOW")
+        if seen_high and seen_low:
+            break
 
     # Confirm that output toggled
     assert seen_high and seen_low, "PWM did not toggle as expected"
+    dut._log.info("PWM toggled successfully — Test passed.")
