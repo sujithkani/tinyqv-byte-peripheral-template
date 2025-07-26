@@ -7,52 +7,47 @@ from cocotb.triggers import ClockCycles
 
 from tqv import TinyQV
 
-# Peripheral number 16 (default for first byte peripheral)
-PERIPHERAL_NUM = 16
+PERIPHERAL_NUM = 16  # Peripheral number
 
 @cocotb.test()
 async def test_project(dut):
     dut._log.info("Start")
 
-    # Start 10 MHz clock (100 ns period)
-    clock = Clock(dut.clk, 100, units="ns")
+    clock = Clock(dut.clk, 100, units="ns")  # 10 MHz
     cocotb.start_soon(clock.start())
 
-    # Create TinyQV helper
     tqv = TinyQV(dut, PERIPHERAL_NUM)
-
-    # Reset the DUT
     await tqv.reset()
     dut._log.info("Reset done")
 
-    # Write PWM duty cycle = 128 (50%)
+    # Set 50% duty cycle (128)
     await tqv.write_reg(0, 128)
     readback = await tqv.read_reg(0)
     assert readback == 128, f"Expected 128, got {readback}"
     dut._log.info("PWM duty written and verified")
 
-    # Wait for counter to wrap (1 full PWM cycle = 256 clk cycles)
-    await ClockCycles(dut.clk, 300)
-
-    # Sample the PWM output over 512 cycles
     seen_high = False
     seen_low = False
+    high_cycles = 0
+    low_cycles = 0
 
-    for cycle in range(512):
+    # Immediately sample after write — for 256 cycles
+    for i in range(256):
         await ClockCycles(dut.clk, 1)
         pwm = int(dut.uo_out.value[0])
+        if pwm == 1:
+            high_cycles += 1
+            if not seen_high:
+                seen_high = True
+                dut._log.info(f"PWM went HIGH at cycle {i}")
+        else:
+            low_cycles += 1
+            if not seen_low:
+                seen_low = True
+                dut._log.info(f"PWM went LOW at cycle {i}")
 
-        if pwm == 1 and not seen_high:
-            seen_high = True
-            dut._log.info(f"PWM went HIGH at cycle {cycle}")
-
-        if pwm == 0 and not seen_low:
-            seen_low = True
-            dut._log.info(f"PWM went LOW at cycle {cycle}")
-
-        if seen_high and seen_low:
-            break
-
-    # Validate PWM behavior
+    # Confirm PWM toggled and duty ratio is close to 50%
     assert seen_high and seen_low, "PWM did not toggle as expected"
-    dut._log.info("PWM toggled successfully — Test passed.")
+    assert abs(high_cycles - low_cycles) <= 4, f"Duty not near 50%: high={high_cycles}, low={low_cycles}"
+
+    dut._log.info(f"PWM toggled: HIGH for {high_cycles} cycles, LOW for {low_cycles} cycles — Test Passed.")
