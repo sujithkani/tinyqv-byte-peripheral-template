@@ -18,7 +18,7 @@ module tqvp_pwm_sujith (
     // PWM duty cycle register
     reg [7:0] duty;
 
-    // 8-bit counter
+    // 8-bit free-running counter
     reg [7:0] counter;
 
     // Write duty cycle at address 0
@@ -29,7 +29,7 @@ module tqvp_pwm_sujith (
             duty <= data_in;
     end
 
-    // Free-running counter (no reset on write!)
+    // Free-running counter
     always @(posedge clk or negedge rst_n) begin
         if (!rst_n)
             counter <= 8'd0;
@@ -40,7 +40,12 @@ module tqvp_pwm_sujith (
     // Read-back interface
     assign data_out = (address == 4'h0) ? duty : 8'd0;
 
-    // PWM output: HIGH if counter < duty
-    assign uo_out = {7'b0, (counter < duty)};
+    // Output counter (7 bits) and PWM (LSB)
+    assign uo_out = {
+        counter[7:1],
+        (duty == 8'd0) ? 1'b0 :
+        (duty == 8'd255) ? 1'b1 :
+        (counter < duty)
+    };
 
 endmodule
