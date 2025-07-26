@@ -7,49 +7,52 @@ from cocotb.triggers import ClockCycles
 
 from tqv import TinyQV
 
-# Set peripheral number to 16 (default for first byte peripheral)
+# Peripheral number 16 (default for first byte peripheral)
 PERIPHERAL_NUM = 16
 
 @cocotb.test()
 async def test_project(dut):
     dut._log.info("Start")
 
-    # Start the clock (100 ns = 10 MHz)
+    # Start 10 MHz clock (100 ns period)
     clock = Clock(dut.clk, 100, units="ns")
     cocotb.start_soon(clock.start())
 
     # Create TinyQV helper
     tqv = TinyQV(dut, PERIPHERAL_NUM)
 
-    # Reset system
+    # Reset the DUT
     await tqv.reset()
+    dut._log.info("Reset done")
 
-    dut._log.info("Writing PWM duty cycle")
-
-    # Write duty cycle = 128 (50%)
+    # Write PWM duty cycle = 128 (50%)
     await tqv.write_reg(0, 128)
     readback = await tqv.read_reg(0)
     assert readback == 128, f"Expected 128, got {readback}"
+    dut._log.info("PWM duty written and verified")
 
-    # Let it settle (after synchronizers and counter)
-    await ClockCycles(dut.clk, 3)
+    # Wait for counter to wrap (1 full PWM cycle = 256 clk cycles)
+    await ClockCycles(dut.clk, 300)
 
-    # Sample the PWM output
+    # Sample the PWM output over 512 cycles
     seen_high = False
     seen_low = False
 
-    for _ in range(512):  # Two full PWM cycles
+    for cycle in range(512):
         await ClockCycles(dut.clk, 1)
         pwm = int(dut.uo_out.value[0])
+
         if pwm == 1 and not seen_high:
             seen_high = True
-            dut._log.info("PWM went HIGH")
+            dut._log.info(f"PWM went HIGH at cycle {cycle}")
+
         if pwm == 0 and not seen_low:
             seen_low = True
-            dut._log.info("PWM went LOW")
+            dut._log.info(f"PWM went LOW at cycle {cycle}")
+
         if seen_high and seen_low:
             break
 
-    # Confirm that output toggled
+    # Validate PWM behavior
     assert seen_high and seen_low, "PWM did not toggle as expected"
     dut._log.info("PWM toggled successfully — Test passed.")
