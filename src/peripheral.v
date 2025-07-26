@@ -3,23 +3,18 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 `default_nettype none
-
-module tqvp_pwm_sujith (
-    input clk, input rst_n,
+module tqvp_pwm_sujith(
+    input clk, rst_n,
     input [7:0] ui_in,
     output [7:0] uo_out,
     input [3:0] address,
     input data_write,
     input [7:0] data_in,
-    output [7:0] data_out
-);
-
+    output [7:0] data_out);
     // PWM duty cycle register
     reg [7:0] duty;
-
     // 8-bit free-running counter
     reg [7:0] counter;
-
     // Write duty cycle at address 0
     always @(posedge clk or negedge rst_n) begin
         if (!rst_n)
@@ -27,7 +22,6 @@ module tqvp_pwm_sujith (
         else if (data_write && address == 4'h0)
             duty<=data_in;
     end
-
     // Free-running counter
     always @(posedge clk or negedge rst_n) begin
         if (!rst_n)
@@ -35,10 +29,8 @@ module tqvp_pwm_sujith (
         else
             counter<=counter + 8'd1;
     end
-
     // Read-back interface
     assign data_out=(address == 4'h0) ? duty : 8'd0;
-
     // Output counter (7 bits) and PWM (LSB)
     assign uo_out={
         counter[7:1],
@@ -46,5 +38,4 @@ module tqvp_pwm_sujith (
         (duty == 8'd255) ? 1'b1 :
         (counter < duty)
     };
-
 endmodule
