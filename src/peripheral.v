@@ -2,7 +2,6 @@
  * Copyright (c) 2025 Sujith Kani
  * SPDX-License-Identifier: Apache-2.0
  */
-
 `default_nettype none
 
 module tqvp_pwm_sujith (
@@ -19,19 +18,18 @@ module tqvp_pwm_sujith (
     // PWM duty cycle register
     reg [7:0] duty;
 
-    // 8-bit counter for PWM period
+    // 8-bit counter
     reg [7:0] counter;
 
-    // Write interface for duty register at address 0
+    // Write duty cycle at address 0
     always @(posedge clk or negedge rst_n) begin
-        if (!rst_n) begin
+        if (!rst_n)
             duty <= 8'd0;
-        end else if (data_write && address == 4'h0) begin
+        else if (data_write && address == 4'h0)
             duty <= data_in;
-        end
     end
 
-    // PWM counter: free-running 8-bit counter (wraps at 255)
+    // Free-running counter (no reset on write!)
     always @(posedge clk or negedge rst_n) begin
         if (!rst_n)
             counter <= 8'd0;
@@ -39,10 +37,10 @@ module tqvp_pwm_sujith (
             counter <= counter + 8'd1;
     end
 
-    // Read-back support: return duty at address 0
+    // Read-back interface
     assign data_out = (address == 4'h0) ? duty : 8'd0;
 
-    // PWM output: uo_out[0] is high when counter < duty
+    // PWM output: HIGH if counter < duty
     assign uo_out = {7'b0, (counter < duty)};
 
 endmodule
